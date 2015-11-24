@@ -89,11 +89,13 @@ module Gibbon
 
     def handle_error(error)
       error_to_raise = nil
-
       begin
         error_to_raise = MailChimpError.new(error.message)
 
         if error.is_a?(Faraday::Error::ClientError) && error.response
+          
+          error_to_raise.request_id = error.response[:headers]['x-request-id']          
+          
           parsed_response = MultiJson.load(error.response[:body])
 
           if parsed_response

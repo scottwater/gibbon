@@ -29,4 +29,11 @@ describe Gibbon::APIRequest do
     stub_request(:get, "#{@api_root}/lists").to_raise(exception)
     expect { @gibbon.lists.retrieve }.to raise_error(Gibbon::MailChimpError)
   end
+  
+  it "sets the request_id on the exception if it is available" do
+    response_values = {:status => 404, :headers => {'x-request-id' => 'the_request_id'}, :body => '[foo]'}
+    exception = Faraday::Error::ClientError.new("the server responded with status 404", response_values)
+    stub_request(:get, "#{@api_root}/lists").to_raise(exception)
+    expect { @gibbon.lists.retrieve }.to raise_error {|error| expect(error.request_id).to eql('the_request_id')}
+  end  
 end
