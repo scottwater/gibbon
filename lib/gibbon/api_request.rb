@@ -92,6 +92,7 @@ module Gibbon
       begin
         error_to_raise = MailChimpError.new(error.message)
 
+        error_to_raise.original_exception = error
         if error.is_a?(Faraday::Error::ClientError) && error.response
           
           error_to_raise.request_id = error.response[:headers]['x-request-id']          
